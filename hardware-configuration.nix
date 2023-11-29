@@ -12,7 +12,7 @@
   boot.initrd.kernelModules = ["dm-snapshot" ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
-  boot.kernelParams = ["i915.force_probe=9a60"];
+  boot.kernelParams = ["i915.force_probe=4688"];
 
   hardware.opengl.enable = true;
   hardware.nvidia.modesetting.enable = true;

@@ -10,7 +10,7 @@
 
   outputs = inputs@{ self, nixpkgs,  ... } :
   let
-    system = "aarch64-linux";
+    system = "x86_64-linux";
     inherit (nixpkgs.lib) nixosSystem;
     nixpkgsArgs = {
       inherit system;
@@ -20,9 +20,7 @@
     nixosConfigurations."thinkpad" = nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = { inherit system nixpkgs; };
-      modules = [({pkgs, ...}: {
-        nixpkgs.overlays = [ inputs.nixpkgs-wayland.overlay ];
-        })
+      modules = [
 	    ./hardware-configuration.nix
 	    ./configuration.nix
       ];
