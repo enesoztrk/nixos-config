@@ -9,37 +9,42 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
     ];
-  nixpkgs.config.allowUnfree = true;
-   # Add the following line to specify the Nixpkgs channel
+
+
+ 
+  fileSystems."/mnt/ubuntu" = {
+    device = "/dev/nvme0n1p5";   # Replace with your actual partition
+    fsType = "ext4";        # Replace with your actual filesystem type
+  };
+	
+# systemd.services.create-symlink = {
+#    description = "Create symlink for prj";
+#    after = [ "local-fs.target" ];
+#    wantedBy = [ "multi-user.target" ];
+#    script = ''
+#      ln -s /mnt/ubuntu/home/enes/prj /home/enes/prj
+#    '';
+#  }; 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
+   nix = {   
+	extraOptions = ''
+  	experimental-features = nix-command flakes
+	substituters = https://cache.vedenemo.dev https://cache.nixos.org/
+        trusted-public-keys = cache.vedenemo.dev:8NhplARANhClUSWJyLVk4WMyy1Wb4rhmWW2u8AejH9E= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
+	'';	
+};
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
-networking.interfaces.wlp0s20f3.useDHCP = false;
-#networking.interfaces.wlp0s20f3.ipv4.addresses = ["192.168.1.12/24"];
-#networking.interfaces.wlp0s20f3.ipv4.gateway = "192.168.1.1";
-networking.defaultGateway = "192.168.1.1";
- networking.nameservers = [ "8.8.8.8" ];
-networking.interfaces.wlp0s20f3.ipv4.addresses = [ {
-  address = "192.168.1.12";
-  prefixLength = 24;
-} ];
-
   # Enable networking
-  networking.networkmanager.enable = true;
- 
-  nix = {   
-	extraOptions = ''
-  	experimental-features = nix-command flakes
-	'';	
-};
+   networking.networkmanager.enable = true;
+
   # Set your time zone.
   time.timeZone = "Europe/Helsinki";
 
@@ -60,20 +65,25 @@ networking.interfaces.wlp0s20f3.ipv4.addresses = [ {
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
-  services.xserver.videoDrivers = ["nouveau"];  
+
   # Enable the GNOME Desktop Environment.
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver = {
-    layout = "us";
+    layout = "tr";
     xkbVariant = "";
   };
-  # Enable CUPS to print documents.
+
+  # Configure console keymap
+  console.keyMap = "trq";
+
+   # Enable CUPS to print documents.
   services.printing.enable = true;
 
-  # Enable sound with pipewire.
+
+   # Enable sound with pipewire.
   sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -102,25 +112,53 @@ networking.interfaces.wlp0s20f3.ipv4.addresses = [ {
       firefox
       slack
       git
+     google-chrome
+     vscode
+     libreoffice
+     go
+     gcc
+     binutils
+ 
+ # build-essential  
+    #  thunderbird
     ];
   };
+
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-   #bolt
-#nvidia_x11
-#nvidiaSettings
-pciutils
-#  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
+  iptables
+  gparted
+#  gedit
+  gnome3.gnome-tweaks
+  gnomeExtensions.topicons-plus
+  gnomeExtensions.dash-to-dock
+  gnomeExtensions.dash-to-panel
+  gnomeExtensions.appindicator
+  gnomeExtensions.clipboard-indicator
+  gnomeExtensions.sound-output-device-chooser
+  gnomeExtensions.ddterm
+  gnomeExtensions.panel-world-clock-lite
+  gnomeExtensions.vitals
+  gnomeExtensions.just-perfection
+  virtualbox
+#  dendrite
+
   ];
 
+#nixpkgs.config.packageOverrides = pkgs: {
+#    dendrite = pkgs.dendrite.overrideAttrs (oldAttrs: {
+#
+#      };
+#    }
 
-
-
-
-# Add bolt to services
+ #   });
+ # };
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -132,23 +170,9 @@ pciutils
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
-#   services.openssh.enable = true;
-services.openssh = {
-  enable = true;
-  settings.PermitRootLogin = "yes";
-#  port = 2222;  # Change this to your desired port
-};
-#networking.interfaces.wlp0s20f3.useDHCP = false;
-#networking.interfaces.wlp0s20f3.ipv4.addresses = ["192.168.1.12/24"];
-#networking.interfaces.wlp0s20f3.ipv4.gateway = "192.168.1.1";
-#networking.defaultGateway = "192.168.1.1";
-# networking.nameservers = [ "8.8.8.8" ];
-#networking.interfaces.wlp0s20f3.ipv4.addresses = [ {
-#  address = "192.168.1.12";
-#  prefixLength = 24;
-#} ];
+  # services.openssh.enable = true;
 
- # Open ports in the firewall.
+  # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
